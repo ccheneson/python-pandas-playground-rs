@@ -1,6 +1,6 @@
 use axum::{routing::post, Router};
 use python_pandas_playground::{
-    controllers::{
+    http::{
         handlers::{create_api, execute_api},
         AppState,
     },
@@ -13,6 +13,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tower_http::services::ServeDir;
+
+const BINDING_ADRESS: &str = "127.0.0.1:3000";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -32,7 +34,7 @@ async fn main() -> Result<(), Error> {
         .nest_service("/", ServeDir::new("./dist/"))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
-    tracing::debug!("listening on {}", listener.local_addr()?);
+    let listener = tokio::net::TcpListener::bind(BINDING_ADRESS).await?;
+    tracing::info!("listening on {}", listener.local_addr()?);
     axum::serve(listener, app).await
 }
