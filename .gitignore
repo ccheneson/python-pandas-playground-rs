@@ -13,6 +13,7 @@ dist
 dist-ssr
 coverage
 *.local
+package-lock.json
 
 /cypress/videos/
 /cypress/screenshots/
@@ -34,3 +35,4 @@ Cargo.lock
 
 
 .history/*
+/app/
