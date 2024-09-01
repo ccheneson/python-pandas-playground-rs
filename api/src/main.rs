@@ -35,8 +35,8 @@ async fn main() -> Result<(), Error> {
     let app = Router::new()
         .route("/code/:api", post(create_api))
         .route("/execute/:api", post(execute_api))
-        .nest_service("/", ServeDir::new("./dist/"))
-        .with_state(state);
+        .with_state(state)
+        .nest_service("/", ServeDir::new("./dist/"));
 
     let listener = tokio::net::TcpListener::bind(BINDING_ADRESS).await?;
     tracing::info!("listening on {}", listener.local_addr()?);

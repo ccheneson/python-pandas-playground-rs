@@ -28,9 +28,11 @@ Docker est utilisé comme sandbox car il
 ## Structure
 
 `api` : le code de l' API en Rust
+
 `www` : le code du front-end en Vue.js
 
 `01-build.sh`   : script pour builder l' application finale qui se trouvera dans un répertoire `app`
+
 `02-run.sh`     : démarre l' application
 
 
@@ -40,4 +42,5 @@ Dans le répertoire du projet, à partir d' un terminal:
 1- Tapez  `./01-build.sh`  
 2- Tapez `./02-run.sh`
 
-Assurez vous que ces 2 scripts sont exécutables. Si ils ne le sont pas, exécutez `chmod u+x  01-build.sh 02-run.sh`
+Assurez vous que ces 2 scripts sont exécutables. 
+Si ils ne le sont pas, exécutez `chmod u+x  01-build.sh 02-run.sh`
