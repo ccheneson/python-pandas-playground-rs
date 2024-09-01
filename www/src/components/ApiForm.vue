@@ -1,35 +1,32 @@
 <template>
   <div id="form">
-    <div>
-      <div>
+      <div id="inputs">
         <label>API name</label>
         <input v-model="input.api" type="text" placeholder="API name" name="api" required />   
+        <div id="submitblock">
+          <button class="submit" @click="submit">Submit</button>
+          <img  v-if="isSubmit" src="@/assets/icons8-spinner.gif"/>
+        </div>
+        <label class="errors" v-if="errors.api">{{ errors.api }}</label>
       </div>
-      <div>
-          <label >Python code</label>
-          <textarea v-model="input.code" type="text" placeholder="Python code here" name="code" rows="20" cols="100" required/>
-      </div>
-      <div>
-          <div id="submitblock">
-            <button class="submit" @click="submit">Submit</button>
-            <img  v-if="isSubmit" src="@/assets/icons8-spinner.gif"/>
-          </div>
-          <label class="errors" v-if="errors.api">{{ errors.api }}</label>
-          <label class="errors" v-if="errors.code">{{ errors.code }}</label>
-      </div>
-    </div>
 
-    <div>    
+ 
+   
       <div>
         <label >Output</label>
         <textarea v-model="output.response"  rows="30" cols="100" class="outputarea" />
       </div>
-    </div>
+  
   </div>
 </template>
 
 
 <script lang="ts">
+
+interface FormErrors {
+  api: string; 
+  code: string;
+}
 
 export default {
   data() {
@@ -50,9 +47,6 @@ export default {
   },
   methods: {
     validate() {
-      if (this.input.code == "") {
-        this.errors.code = "Python code required"
-      } 
       if (this.input.api == "") {
         this.errors.api = "API name required"
       }
@@ -61,11 +55,12 @@ export default {
     submit() {
       this.errors = {};
       this.isSubmit = false;
+
       if (this.validate()) {
         return false
       } else {
       this.isSubmit = true;
-      fetch(`http://localhost:3000/code/${this.input.api}`,{
+      fetch(`http://localhost:3000/execute/${this.input.api}`,{
         method:  'POST',
         body: this.input.code
       })
@@ -76,9 +71,10 @@ export default {
           this.isSubmit = false;
           this.output.response = data
         })
-        .catch(function (error) {
+        .catch( (error) => {
           this.isSubmit = false;
           console.log(`A http error occured: ${error}`);
+          this.output.response = `A http error occured: ${error}`
         });
       }
     }
@@ -118,6 +114,19 @@ div {
  }
 
 
+#inputs {
+  display: grid;
+  width: 400px;
+  height: fit-content;
+  margin-right: 30px;
+} 
+
+input {
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+
 #form {
   display: flex;
   float: left;
@@ -133,10 +142,13 @@ div {
 }
 
 
+
 #submitblock {
   display: flex;
   float: left;
   align-items: center;
 }
+
+
 
 </style>
