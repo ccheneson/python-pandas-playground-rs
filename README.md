@@ -9,7 +9,7 @@ Ce projet consiste à créer une application qui permettra
 
 * Rust/axum utilisés pour la partie API
 * Vue.js pour le développement de la partie front
-* Docker pour le sandbox: L' image utilisé est [amancevice/pandas](https://hub.docker.com/r/amancevice/pandas). If you decide to take another image (i.e. make your own image), you can set it via the env variable `DOCKER_IMAGE`
+* Docker pour le sandbox: L' image utilisé est [amancevice/pandas](https://hub.docker.com/r/amancevice/pandas). Si vous préferez utiliser une autre image (i.e. votre propre image créée à partir d' un Dockerfile), vous pouvez utiliser la variable d' environment `DOCKER_IMAGE`
 
 Docker est utilisé comme sandbox car il
 * est un choix populaire (et prouvé) dans le monde des conteneurs
@@ -21,7 +21,7 @@ Docker est utilisé comme sandbox car il
 
 ## Prérequis
 * Docker installé
-* Configurer votre envrionment pour pouvoir executer `docker` en tant qu' utilisateur (plus d 'info [ici](https://docs.docker.com/engine/install/linux-postinstall/))
+* Configurer votre environment pour pouvoir executer `docker` en tant qu' utilisateur (plus d 'info [ici](https://docs.docker.com/engine/install/linux-postinstall/)) et n' aura donc pas besoin de `sudo`.
 
 
 
@@ -42,5 +42,16 @@ Dans le répertoire du projet, à partir d' un terminal:
 1- Tapez  `./01-build.sh`  
 2- Tapez `./02-run.sh`
 
-Assurez vous que ces 2 scripts sont exécutables. 
-Si ils ne le sont pas, exécutez `chmod u+x  01-build.sh 02-run.sh`
+Assurez vous que ces 2 scripts soient exécutables. 
+
+Si ils ne le sont pas, exécutez `chmod u+x  01-build.sh 02-run.sh`.
+
+
+## Choix technique
+Comme mentionné dans la section **Stack technique**, Docker est un choix populaire dans le monde des conteneurs.
+
+1 inconvénient pour notre application: Si l' image n' est pas présente dans notre répository Docker local, la toute 1ère requête prendra le temps de téléchargement de l' image + temps d' éxecution.
+
+Pour les requêtes suivantes (et celle après redémarrage du serveur), le requête ne prendrait que le temps d' éxecution.
+
+

@@ -12,14 +12,18 @@ pub async fn create_api(
     payload: String,
 ) -> impl IntoResponse {
     println!("{}", payload);
-    let mut data = repository.repository.lock().expect("mutex was poisoned");
+    let mut data = repository
+        .repository
+        .lock()
+        .expect("[repository]mutex was poisoned");
+
     data.add_code(api, payload);
     (StatusCode::CREATED, "Python code added to repository")
 }
 
 pub async fn execute_api(
     State(repository_state): State<AppState>,
-    State(docker_cli_state): State<AppState>,
+    State(sandbox_state): State<AppState>,
     Path(api): Path<String>,
 ) -> impl IntoResponse {
     let repository = repository_state
@@ -27,8 +31,8 @@ pub async fn execute_api(
         .lock()
         .expect("[repository]mutex was poisoned");
 
-    let docker_cli = &mut docker_cli_state
-        .docker_cli
+    let sandbox = &mut sandbox_state
+        .sandbox
         .lock()
         .expect("[docker-cli]mutex was poisoned");
 
@@ -38,7 +42,7 @@ pub async fn execute_api(
             (StatusCode::NOT_FOUND, "Code not found".to_owned())
         }
         Some(py_code) => {
-            let result = docker_cli.execute_in_sandbox(py_code);
+            let result = sandbox.execute_in_sandbox(py_code);
             match result {
                 Ok(output) => (StatusCode::OK, output),
                 Err(err) => {
@@ -91,7 +95,7 @@ mod tests {
 
         let state = axum::extract::State(AppState {
             repository: Arc::new(Mutex::new(repository)),
-            docker_cli: Arc::new(Mutex::new(sandbox_ok)),
+            sandbox: Arc::new(Mutex::new(sandbox_ok)),
         });
 
         let payload = "mypythoncode".to_owned();
@@ -129,7 +133,7 @@ mod tests {
 
         let state = axum::extract::State(AppState {
             repository: Arc::new(Mutex::new(repository)),
-            docker_cli: Arc::new(Mutex::new(sandbox_ko)),
+            sandbox: Arc::new(Mutex::new(sandbox_ko)),
         });
 
         let payload = "mypythoncode".to_owned();

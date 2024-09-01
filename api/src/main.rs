@@ -29,7 +29,7 @@ async fn main() -> Result<(), Error> {
 
     let state = AppState {
         repository: Arc::new(Mutex::new(repository)),
-        docker_cli: Arc::new(Mutex::new(sandbox)),
+        sandbox: Arc::new(Mutex::new(sandbox)),
     };
 
     let app = Router::new()
