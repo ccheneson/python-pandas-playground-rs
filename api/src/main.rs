@@ -29,7 +29,7 @@ async fn main() -> Result<(), Error> {
     let app = Router::new()
         .route("/code/:api", post(create_api))
         .route("/execute/:api", post(execute_api))
-        .nest_service("/", ServeDir::new("www/dist/"))
+        .nest_service("/", ServeDir::new("./dist/"))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
