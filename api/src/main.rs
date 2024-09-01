@@ -5,6 +5,7 @@ use python_pandas_playground::{
         AppState,
     },
     repositories::map_repository::MapRepository,
+    sandbox::docker_sandbox::DockerSandbox,
 };
 use std::{
     collections::HashMap,
@@ -21,11 +22,14 @@ async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt::init();
 
     let inner_repo: HashMap<String, String> = HashMap::new();
-    let sandbox_docker_image = env::var("DOCKER_IMAGE").unwrap_or("amancevice/pandas".to_owned());
+    let repository = MapRepository::new(inner_repo);
+
+    let docker_image = env::var("DOCKER_IMAGE").unwrap_or("amancevice/pandas".to_owned());
+    let sandbox = DockerSandbox::new(docker_image);
 
     let state = AppState {
-        repository: Arc::new(Mutex::new(MapRepository::new(inner_repo))),
-        docker_image: sandbox_docker_image,
+        repository: Arc::new(Mutex::new(repository)),
+        docker_cli: Arc::new(Mutex::new(sandbox)),
     };
 
     let app = Router::new()

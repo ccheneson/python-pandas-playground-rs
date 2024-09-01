@@ -24,26 +24,30 @@ pub async fn create_api(
 
 pub async fn execute_api(
     State(repository_state): State<AppState>,
-    State(docker_image_state): State<AppState>,
+    State(docker_cli_state): State<AppState>,
     Path(api): Path<String>,
 ) -> impl IntoResponse {
-    let data = repository_state
+    let repository = repository_state
         .repository
         .lock()
-        .expect("mutex was poisoned");
+        .expect("[repository]mutex was poisoned");
 
-    match data.get_code(api) {
+    let docker_cli = &mut docker_cli_state
+        .docker_cli
+        .lock()
+        .expect("[docker-cli]mutex was poisoned");
+
+    match repository.get_code(api) {
         None => {
-            std::mem::drop(data);
+            std::mem::drop(repository);
             (StatusCode::NOT_FOUND, "Code not found".to_owned())
         }
         Some(py_code) => {
-            let sandbox = DockerSandbox::new(py_code.to_owned(), docker_image_state.docker_image);
-            let result = sandbox.execute_in_sandbox();
+            let result = docker_cli.execute_in_sandbox(py_code);
             match result {
                 Ok(output) => (StatusCode::OK, output),
                 Err(err) => {
-                    std::mem::drop(data);
+                    std::mem::drop(repository);
                     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
                 }
             }
