@@ -52,6 +52,6 @@ Comme mentionné dans la section **Stack technique**, Docker est un choix popula
 
 1 inconvénient pour notre application: Si l' image n' est pas présente dans notre répository Docker local, la toute 1ère requête prendra le temps de téléchargement de l' image + temps d' éxecution.
 
-Pour les requêtes suivantes (et celle après redémarrage du serveur), le requête ne prendrait que le temps d' éxecution.
+Pour les requêtes suivantes, la requête ne prendrait que le temps d' éxecution.
 
 

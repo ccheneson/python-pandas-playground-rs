@@ -1,31 +1,33 @@
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    response::IntoResponse,
 };
 
-use super::AppState;
+use super::{errors::HttpError, AppState};
 
 pub async fn create_api(
     State(repository): State<AppState>,
     Path(api): Path<String>,
     payload: String,
-) -> impl IntoResponse {
+) -> Result<(StatusCode, String), HttpError> {
     println!("{}", payload);
     let mut data = repository
         .repository
         .lock()
         .expect("[repository]mutex was poisoned");
 
-    data.add_code(api, payload);
-    (StatusCode::CREATED, "Python code added to repository")
+    data.add_code(api, payload)?;
+    Ok((
+        StatusCode::CREATED,
+        "Python code added to repository".to_owned(),
+    ))
 }
 
 pub async fn execute_api(
     State(repository_state): State<AppState>,
     State(sandbox_state): State<AppState>,
     Path(api): Path<String>,
-) -> impl IntoResponse {
+) -> Result<(StatusCode, String), HttpError> {
     let repository = repository_state
         .repository
         .lock()
@@ -36,21 +38,20 @@ pub async fn execute_api(
         .lock()
         .expect("[docker-cli]mutex was poisoned");
 
-    match repository.get_code(api) {
+    let maybe_code = repository.get_code(api)?;
+
+    match maybe_code {
         None => {
             std::mem::drop(repository);
-            (StatusCode::NOT_FOUND, "Code not found".to_owned())
+            Ok((StatusCode::NOT_FOUND, "Code not found".to_owned()))
         }
-        Some(py_code) => {
-            let result = sandbox.execute_in_sandbox(py_code);
-            match result {
-                Ok(output) => (StatusCode::OK, output),
-                Err(err) => {
-                    std::mem::drop(repository);
-                    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
-                }
-            }
-        }
+        Some(py_code) => sandbox
+            .execute_in_sandbox(py_code)
+            .map(|output| (StatusCode::OK, output))
+            .map_err(|err| {
+                std::mem::drop(repository);
+                err.into()
+            }),
     }
 }
 
@@ -61,6 +62,7 @@ mod tests {
         sync::{Arc, Mutex},
     };
 
+    use anyhow::anyhow;
     use axum::{body, extract::Path, http::StatusCode, response::IntoResponse};
 
     use crate::{
@@ -74,15 +76,15 @@ mod tests {
 
     struct SandboxTestOk();
     impl Sandbox for SandboxTestOk {
-        fn execute_in_sandbox(&self, py_code: &str) -> Result<String, Box<dyn std::error::Error>> {
+        fn execute_in_sandbox(&self, py_code: &str) -> Result<String, anyhow::Error> {
             Ok(py_code.to_owned())
         }
     }
 
     struct SandboxTestKo();
     impl Sandbox for SandboxTestKo {
-        fn execute_in_sandbox(&self, _: &str) -> Result<String, Box<dyn std::error::Error>> {
-            Err(Box::new(PythonCodeExecutionError(
+        fn execute_in_sandbox(&self, _: &str) -> Result<String, anyhow::Error> {
+            Err(anyhow!(PythonCodeExecutionError(
                 "Error in execution of the python code".to_owned(),
             )))
         }
@@ -110,16 +112,10 @@ mod tests {
         .into_response();
 
         //Execute api
-        let resp_execute = execute_api(state.clone(), state.clone(), Path("apiname".to_owned()))
-            .await
-            .into_response();
-
-        let status = resp_execute.status();
-        let body_string: String = body::to_bytes(resp_execute.into_body(), usize::MAX)
-            .await
-            .into_iter()
-            .flat_map(|bytes| String::from_utf8(bytes.to_vec()))
-            .collect();
+        let (status, body_string) =
+            execute_api(state.clone(), state.clone(), Path("apiname".to_owned()))
+                .await
+                .unwrap();
 
         assert_eq!(resp_create.status(), StatusCode::CREATED);
         assert_eq!(status, StatusCode::OK);

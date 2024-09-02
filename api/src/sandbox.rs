@@ -1,9 +1,7 @@
-use std::error::Error;
-
 pub mod docker_sandbox;
 
 pub trait Sandbox {
-    fn execute_in_sandbox(&self, py_code: &str) -> Result<String, Box<dyn Error>>;
+    fn execute_in_sandbox(&self, py_code: &str) -> Result<String, anyhow::Error>;
 }
 
 pub mod errors {

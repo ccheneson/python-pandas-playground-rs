@@ -1,6 +1,7 @@
 use crate::{repositories::ApiToCode, sandbox::Sandbox};
 use std::sync::{Arc, Mutex};
 
+pub mod errors;
 pub mod handlers;
 
 #[derive(Clone)]

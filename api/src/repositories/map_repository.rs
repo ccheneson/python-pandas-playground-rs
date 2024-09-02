@@ -13,11 +13,12 @@ impl MapRepository {
 }
 
 impl ApiToCode for MapRepository {
-    fn add_code(&mut self, api: String, code: String) {
+    fn add_code(&mut self, api: String, code: String) -> Result<(), anyhow::Error> {
         self.repository.insert(api, code);
+        Ok(())
     }
 
-    fn get_code(&self, api: String) -> Option<&String> {
-        self.repository.get(&api)
+    fn get_code(&self, api: String) -> Result<Option<&String>, anyhow::Error> {
+        Ok(self.repository.get(&api))
     }
 }
