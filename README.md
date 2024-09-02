@@ -37,7 +37,7 @@ Docker est utilisé comme sandbox car il
 
 `www` : le code du front-end en Vue.js
 
-`01-build.sh`   : script pour builder l' application finale qui se trouvera dans un répertoire `app`
+`01-build.sh`   : script pour builder le backend et le frontend et copiera les fichiers nécessaires un répertoire `app`
 
 `02-run.sh`     : démarre l' application
 
