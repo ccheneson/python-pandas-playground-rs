@@ -8,21 +8,17 @@ use super::{
 };
 
 pub struct DockerSandbox {
-    py_code: String,
     docker_image: String,
 }
 
 impl DockerSandbox {
-    pub fn new(py_code: String, docker_image: String) -> Self {
-        Self {
-            py_code,
-            docker_image,
-        }
+    pub fn new(docker_image: String) -> Self {
+        Self { docker_image }
     }
 }
 
 impl Sandbox for DockerSandbox {
-    fn execute_in_sandbox(&self) -> Result<String, Box<dyn Error>> {
+    fn execute_in_sandbox(&self, py_code: &str) -> Result<String, Box<dyn Error>> {
         let execution = Command::new("docker")
             .args(&[
                 "run",
@@ -30,7 +26,7 @@ impl Sandbox for DockerSandbox {
                 self.docker_image.as_str(),
                 "python",
                 "-c",
-                self.py_code.as_str(),
+                py_code,
             ])
             .output();
         match execution {

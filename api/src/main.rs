@@ -1,10 +1,11 @@
 use axum::{routing::post, Router};
 use python_pandas_playground::{
-    controllers::{
+    http::{
         handlers::{create_api, execute_api},
         AppState,
     },
     repositories::map_repository::MapRepository,
+    sandbox::docker_sandbox::DockerSandbox,
 };
 use std::{
     collections::HashMap,
@@ -14,25 +15,30 @@ use std::{
 };
 use tower_http::services::ServeDir;
 
+const BINDING_ADRESS: &str = "127.0.0.1:3000";
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt::init();
 
     let inner_repo: HashMap<String, String> = HashMap::new();
-    let sandbox_docker_image = env::var("DOCKER_IMAGE").unwrap_or("amancevice/pandas".to_owned());
+    let repository = MapRepository::new(inner_repo);
+
+    let docker_image = env::var("DOCKER_IMAGE").unwrap_or("amancevice/pandas".to_owned());
+    let sandbox = DockerSandbox::new(docker_image);
 
     let state = AppState {
-        repository: Arc::new(Mutex::new(MapRepository::new(inner_repo))),
-        docker_image: sandbox_docker_image,
+        repository: Arc::new(Mutex::new(repository)),
+        sandbox: Arc::new(Mutex::new(sandbox)),
     };
 
     let app = Router::new()
         .route("/code/:api", post(create_api))
         .route("/execute/:api", post(execute_api))
-        .nest_service("/", ServeDir::new("www/dist/"))
-        .with_state(state);
+        .with_state(state)
+        .nest_service("/", ServeDir::new("./dist/"));
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
-    tracing::debug!("listening on {}", listener.local_addr()?);
+    let listener = tokio::net::TcpListener::bind(BINDING_ADRESS).await?;
+    tracing::info!("listening on {}", listener.local_addr()?);
     axum::serve(listener, app).await
 }
