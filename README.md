@@ -5,7 +5,7 @@ Ce projet consiste à créer une application qui permettra
 * à un configurateur d' envoyer du code python et d' en faire une API
 * à un utilisateur d' éxecuter cette API
 
-## Exigences technique:
+## Exigences techniques:
 * Utilisation de Axum pour le framework web.
 * Le code Python doit pouvoir utiliser la bibliothèque pandas.
 * Suivre les principes du clean code / YAGNI : implémenter uniquement ce qui est nécessaire pour que cela fonctionne.
