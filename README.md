@@ -5,11 +5,17 @@ Ce projet consiste à créer une application qui permettra
 * à un configurateur d' envoyer du code python et d' en faire une API
 * à un utilisateur d' éxecuter cette API
 
+## Exigences technique:
+• Utilisation de Axum pour le framework web.
+• Le code Python doit pouvoir utiliser la bibliothèque pandas.
+• Suivre les principes du clean code / YAGNI : implémenter uniquement ce qui est nécessaire
+pour que cela fonctionne.
+
 ## Stack technique
 
 * Rust/axum utilisés pour la partie API
 * Vue.js pour le développement de la partie front
-* Docker pour le sandbox: L' image utilisé est [amancevice/pandas](https://hub.docker.com/r/amancevice/pandas). Si vous préferez utiliser une autre image (i.e. votre propre image créée à partir d' un Dockerfile), vous pouvez utiliser la variable d' environment `DOCKER_IMAGE`
+* Docker pour le sandbox: L' image utilisée est [amancevice/pandas](https://hub.docker.com/r/amancevice/pandas). Si vous préferez utiliser une autre image (i.e. votre propre image créée à partir d' un Dockerfile), vous pouvez utiliser la variable d' environment `DOCKER_IMAGE`
 
 Docker est utilisé comme sandbox car il
 * est un choix populaire (et prouvé) dans le monde des conteneurs
@@ -52,10 +58,15 @@ Comme mentionné dans la section **Stack technique**, Docker est un choix popula
 
 1 inconvénient pour notre application: Si l' image n' est pas présente dans notre répository Docker local, la toute 1ère requête prendra le temps de téléchargement de l' image + temps d' éxecution.
 
-Pour les requêtes suivantes, le requête ne prendrait que le temps d' éxecution.
+Pour les requêtes suivantes, la requête ne prendrait que le temps d' éxecution.
 
 
-L' application se compose de 3 parties:
+#### Backend
+Le service se compose de 3 parties:
 - `http/handlers` où se trouve la logique des endpoints
 - `repositories` qui servira de persistence. Pour cette application, nous utiliserons un simple HashMap. Pour notre cas, nous pouvons utiliser les types directement sans utiliser de `Result` pour la gestion d' erreur. 
 - `sandbox` qui se chargera de l' execution dans le docker. Le sandbox éxecute une commande qui peut échouer tant que la commande `docker` que le code python. C' est pour cela que l' on utilisera un type `Result` pour la gestion d' erreur
+
+
+#### Frontend
+La partie interface est développée en Vue.js et sera servie par Rust/axum au lieu de node
