@@ -65,7 +65,7 @@ Pour les requêtes suivantes, la requête ne prendrait que le temps d' éxecutio
 #### Backend
 Le service se compose de 3 parties:
 - `http/handlers` où se trouve la logique des endpoints
-- `repositories` qui servira de persistence. Pour cette application, nous utiliserons un simple HashMap. Pour notre cas, nous pouvons utiliser les types directement sans utiliser de `Result` pour la gestion d' erreur. 
+- `repositories` qui servira de persistence. Pour cette application, nous utiliserons un simple HashMap dont la clé sera le nom de l' api et la valeur sera la code python. Pour notre cas simple, nous pouvons utiliser les types directement sans utiliser de `Result` pour la gestion d' erreur. 
 - `sandbox` qui se chargera de l' execution dans le docker. Le sandbox éxecute une commande qui peut échouer tant que la commande `docker` que le code python. C' est pour cela que l' on utilisera un type `Result` pour la gestion d' erreur
 
 
