@@ -11,7 +11,7 @@ pub async fn create_api(
     Path(api): Path<String>,
     payload: String,
 ) -> impl IntoResponse {
-    println!("{}", payload);
+    tracing::info!("Entering create_api with api '{}' ", api);
     let mut data = repository
         .repository
         .lock()
@@ -26,6 +26,8 @@ pub async fn execute_api(
     State(sandbox_state): State<AppState>,
     Path(api): Path<String>,
 ) -> impl IntoResponse {
+    tracing::info!("Entering execute_api with api '{}' ", api);
+
     let repository = repository_state
         .repository
         .lock()
@@ -39,6 +41,7 @@ pub async fn execute_api(
     match repository.get_code(api) {
         None => {
             std::mem::drop(repository);
+            tracing::info!("Code not found");
             (StatusCode::NOT_FOUND, "Code not found".to_owned())
         }
         Some(py_code) => {
@@ -46,6 +49,7 @@ pub async fn execute_api(
             match result {
                 Ok(output) => (StatusCode::OK, output),
                 Err(err) => {
+                    tracing::error!("An error occured: {}", err.to_string());
                     std::mem::drop(repository);
                     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
                 }
