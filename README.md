@@ -72,7 +72,8 @@ La partie interface est développée en Vue.js et sera servie par Rust/axum au l
 
 ## Utilisation
 
-Au démarrage, sur le port 3000 (e.g. `http://localhost:3000`), vous arrivez sur la page suivante
+Au démarrage, sur le port 3000 (e.g. `http://localhost:3000`), 
+* vous arrivez sur la page suivante
 ![](docs/home.png)
 
 * La page "Code" va vous permetre d' ajouter le code python à une API
