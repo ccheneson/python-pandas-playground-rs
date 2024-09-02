@@ -30,9 +30,22 @@
 
 
 <script lang="ts">
+declare interface FormErrors {
+  api: string; 
+  code: string;
+}
+
+declare interface AppResponse {
+  response: string; 
+}
 
 export default {
-  data() {
+  data() : {
+    errors: FormErrors,
+    input: FormErrors,
+    output: AppResponse,
+    isSubmit: boolean
+  }{
     return {
       errors: {
         api: "",
@@ -50,16 +63,17 @@ export default {
   },
   methods: {
     validate() {
+      let isValid = (this.input.code == "" ) || (this.input.api == "" )
       if (this.input.code == "") {
         this.errors.code = "Python code required"
       } 
       if (this.input.api == "") {
         this.errors.api = "API name required"
       }
-      return Object.keys(this.errors).length
+      return isValid
     },
     submit() {
-      this.errors = {};
+      this.errors  = { api : "", code: ""};
       this.isSubmit = false;
       if (this.validate()) {
         return false
