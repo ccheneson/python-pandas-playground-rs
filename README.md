@@ -6,10 +6,9 @@ Ce projet consiste à créer une application qui permettra
 * à un utilisateur d' éxecuter cette API
 
 ## Exigences technique:
-• Utilisation de Axum pour le framework web.
-• Le code Python doit pouvoir utiliser la bibliothèque pandas.
-• Suivre les principes du clean code / YAGNI : implémenter uniquement ce qui est nécessaire
-pour que cela fonctionne.
+* Utilisation de Axum pour le framework web.
+* Le code Python doit pouvoir utiliser la bibliothèque pandas.
+* Suivre les principes du clean code / YAGNI : implémenter uniquement ce qui est nécessaire pour que cela fonctionne.
 
 ## Stack technique
 
