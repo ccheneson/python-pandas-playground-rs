@@ -25,7 +25,7 @@ Docker est utilisé comme sandbox car il
 * open-source
 
 ## Prérequis
-* Docker installé (plus particulièrement docker cli)
+* Docker installé
 * Configurer votre environment pour pouvoir executer `docker` en tant qu' utilisateur (plus d 'info [ici](https://docs.docker.com/engine/install/linux-postinstall/)) et n' aura donc pas besoin de `sudo`.
 * Rust+Cargo
 * npm
